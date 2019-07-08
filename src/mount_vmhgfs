@@ -1,0 +1,1 @@
+.host:/ /mnt/hgfs fuse.vmhgfs-fuse defaults 0 0 

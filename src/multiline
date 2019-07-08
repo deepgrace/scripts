@@ -1,0 +1,35 @@
+#!/bin/bash
+# multiline
+# same as paste
+
+(( $# == 0 )) && exit 1
+
+file=(${@})
+((len=${#file[@]}-1))
+
+loop()
+{
+   for ((i=0; i<len+1; ++i)); do
+         ((fd=i+10))
+           ${1}
+   done
+}
+
+fd.create()
+{
+   eval exec "${fd}<${file[i]}"
+   read=("${read[@]}" read "-u" "${fd}" line${i} "&&")
+}
+
+fd.destroy()
+{
+   eval exec "${fd}<&-"
+}
+
+loop fd.create
+
+while eval "${read[@]:0:${#read[@]}-1}"; do
+      eval echo $(eval echo \\\${line{0..${len}}} | sed -e 's#\$#\"\$#g; s#}#}\"#g')
+done
+
+loop fd.destroy

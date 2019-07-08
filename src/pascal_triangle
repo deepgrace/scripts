@@ -1,0 +1,14 @@
+#!/bin/bash
+# pascal_triangle
+ 
+echo $((vector[0]=1))
+for ((row=1; row<=${1:-0}; ++row)); do
+      vector[row]=1
+      for ((col=row-1; col>0; --col)); do
+            ((vector[col]+=vector[col-1]))
+      done
+      for ((col=0; col<=row; ++col)); do
+            echo -n "${vector[col]} "
+      done
+      echo
+done

@@ -1,0 +1,51 @@
+#!/bin/bash
+# lcs: Longest common substring
+
+str1=${1:-abcabc}
+str2=${2:-babcab}
+
+str1_len=${#str1}
+str2_len=${#str2}
+
+get.swap()
+{
+    value=${!1}
+    eval ${1}=${!2}
+    eval ${2}=${value}
+}
+
+get.lcs()
+{
+    if (( str1_len > str2_len )); then
+          get.swap str1 str2
+          get.swap str1_len str2_len
+    fi
+
+    for ((i=0; i!=str1_len; ++i)); do
+          k=0
+          for ((j=0; j!=str2_len; ++j)); do
+                ((m=i+k))
+	        if [[ ${str1:m:1} != ${str2:j:1} ]]; then
+                      [[ ${str1:i:1} == ${str2:j:1} ]] && k=1 || k=0
+                else
+                      ((++k))
+                fi
+
+                if (( k > max )); then
+                      ((up=i))
+                      ((max=k))
+                fi 
+
+                if (( k == ${#str2} )); then
+                      ((up=i))
+                      ((max=k))
+                      break 2
+                fi
+          done
+    done
+
+    echo ${str1} ${str2}
+    echo ${up} ${max} ${str1:up:max}
+}
+
+get.lcs

@@ -1,0 +1,56 @@
+#!/bin/bash
+# install_clang
+
+cfe=cfe-3.3.src
+llvm=llvm-3.3.src
+libcxx=libcxx-3.3.src
+tools=clang-tools-extra-3.3.src
+compiler_rt=compiler-rt-3.3.src
+
+lib_dir=/usr/lib
+base_dir=/usr/local
+libcpp_so=libc++.so.1.0
+source_dir=${PWD}/${llvm}
+build_dir=${base_dir}/build
+install_dir=${base_dir}/clang
+include_dir=/usr/include/c++/v1
+lib_name=${lib_dir}/${libcpp_so}
+base_url=http://llvm.org/releases/3.3
+
+mkdir -p ${build_dir} ${install_dir} ${include_dir}
+
+for src in ${cfe} ${llvm} ${compiler_rt} ${libcxx} ${tools}; do
+        name=${src}.tar.gz
+        wget ${base_url}/${name} -o /dev/null
+        tar -xf ${name}
+done
+
+mv ${cfe} ${llvm}/tools/clang
+mv ${tools} ${llvm}/tools/clang/extra
+mv ${compiler_rt} ${llvm}/projects/compiler-rt
+
+cd ${build_dir}
+ 
+${source_dir}/configure --prefix=${install_dir} --enable-optimized --enable-targets=host-only
+make -j4
+make install
+
+rm -rf ${build_dir}
+
+export PATH=${PATH}:${install_dir}/bin
+
+libcpp_dir=${source_dir%/*}/${libcxx}
+
+cd ${libcpp_dir}/lib
+./buildit
+cp ${libcpp_so} ${lib_dir}
+cd ${lib_dir}
+ln -sf ${lib_name} libc++.so
+ln -sf ${lib_name} libc++.so.1
+cp -a ${libcpp_dir}/include ${include_dir} 
+
+cat << \EOF >> ${HOME}/.bashrc
+clang_base=/usr/local/clang
+export PATH=${PATH}:${clang_base}/bin
+export LD_LIBRARY_PATH=${clang_base}/lib:/usr/lib:/usr/lib64
+EOF

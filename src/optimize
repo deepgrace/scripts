@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -o vi
+export TERM=xterm-256color
+export HISTTIMEFORMAT="%F %D %T "
+shopt -s autocd cdable_vars cdspell checkhash checkjobs checkwinsize cmdhist dotglob execfail
+shopt -s expand_aliases extglob extquote force_fignore globstar gnu_errfmt histappend hostcomplete
+shopt -s histreedit histverify interactive_comments progcomp promptvars shift_verbose sourcepath xpg_echo
+
+path=/proc/sys/net
+core=${path}/core
+proc=${path}/ipv4
+conf=${proc}/conf
+
+for i in r w; do
+    echo "16777216" > ${core}/${i}mem_max 
+done
+
+echo "4096 87380 16777216" > ${proc}/tcp_rmem
+echo "4096 65536 16777216" > ${proc}/tcp_wmem
+echo "786432 1048576 1572864" > ${proc}/tcp_mem
+echo 0 > ${proc}/tcp_timestamps
+echo 30 > ${proc}/tcp_fin_timeout
+echo 1800 > ${proc}/tcp_keepalive_time
+echo "1024 65000" > ${proc}/ip_local_port_range
+ulimit -HSn 65536
+
+for i in window_scaling syncookies tw_reuse tw_recycle; do
+    echo 1 > ${proc}/tcp_${i}
+done
+
+for i in eth0 lo default all; do
+    for int in accept_source_route accept_redirects send_redirects; do
+        echo 0 > ${conf}/${i}/${int} 
+    done
+    echo 1 > ${conf}/${i}/secure_redirects 
+done
+
+for i in soft hard; do
+    for j in nofile nproc; do
+        echo "* ${i} ${j} 65536" >> /etc/security/limits.conf
+    done
+done

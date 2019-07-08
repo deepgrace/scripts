@@ -1,0 +1,67 @@
+#!/bin/bash
+# install_gcc
+
+base_dir=/usr/local
+version=${1:-gcc-8.2.0}
+tarball=${version}.tar.bz2
+build_dir=${base_dir}/build
+source_dir=${PWD}/${version}
+gnu_ftp=http://ftp.gnu.org/gnu/gcc
+install_dir=${base_dir}/${version//-/.}
+filename=${gnu_ftp}/${version}/${tarball}
+
+dnf -y install glibc-devel.i686
+mkdir -p ${build_dir} ${install_dir}
+wget -o /dev/null ${filename}
+tar -xf ${tarball}
+cd ${version}
+
+${source_dir}/contrib/download_prerequisites
+
+# or 
+#
+# wget -o /dev/null ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.2.tar.gz
+#      tar -xf mpc-1.0.2.tar.gz
+#      mv mpc-1.0.2 ${source_dir}/mpc
+# wget -o /dev/null http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
+#      tar -xf mpfr-3.1.2.tar.bz2
+#      mv mpfr-3.1.2 ${source_dir}/mpfr
+# wget -o /dev/null ftp://ftp.gmplib.org/pub/gmp-6.0.0/gmp-6.0.0.tar.bz2
+#      tar -xf gmp-6.0.0.tar.bz2
+#      mv gmp-6.0.0 ${source_dir}/gmp
+
+cd ${build_dir}
+
+${source_dir}/configure \
+--prefix=${install_dir} \
+--enable-bootstrap \
+--enable-shared \
+--enable-threads=posix \
+--enable-checking=release \
+--with-system-zlib \
+--enable-__cxa_atexit \
+--disable-libunwind-exceptions \
+--enable-gnu-unique-object \
+--enable-languages=c,c++,objc,obj-c++,fortran,go \
+--disable-dssi \
+--enable-libgcj-multifile \
+--disable-libjava-multilib \
+--with-ppl \
+--with-cloog \
+--with-tune=generic \
+--with-arch_32=i686 \
+--build=x86_64-redhat-linux
+
+make && make install
+rm -rf ${build_dir}
+dnf -y remove $(rpm -qa | grep ^gcc-)
+
+cat << \EOF >> ${HOME}/.bashrc
+gcc_base=/usr/local/gcc.8.2.0
+gcc_bin=${gcc_base}/bin
+gcc_lib=${gcc_base}/lib
+gcc_lib64=${gcc_base}/lib64
+gcc_include=${gcc_base}/include
+export PATH=${gcc_bin}:${PATH}
+export LD_LIBRARY_PATH=${gcc_lib}:/usr/lib:${gcc_lib64}:/usr/lib64:${gcc_include}
+EOF

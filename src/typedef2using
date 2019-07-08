@@ -1,0 +1,3 @@
+#!/bin/bash
+
+grep -rl typedef * | xargs -i sed -ri '/typedef/s!(.*)(typedef) (.*) ([^ ]+);!\1using \4 = \3;!g' {}

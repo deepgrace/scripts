@@ -1,0 +1,17 @@
+#!/bin/bash
+# recursive_list_data
+ 
+list.data()
+{
+   for i in ${@}/*
+   {
+       [[ -e "${i}" ]] && echo "${i}"
+       [[ -d "${i}" ]] && list.data "${i}"
+   }
+}
+ 
+for path in "${@}"
+{
+    echo "${path}"
+    list.data "${path}"
+}

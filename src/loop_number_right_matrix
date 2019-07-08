@@ -1,0 +1,44 @@
+#!/bin/bash
+# circle_number_right_matrix
+ 
+num=${1:-10}
+cur_number=0
+((range=num-1))
+((loop=num%2+num/2))
+
+circle.number.show()
+{
+   for ((row=0; row!=num; ++row))
+   {
+         number=vec${row}[@]
+         echo ${!number}
+   }
+}
+
+circle.number.generate()
+{
+   for ((i=0; i!=loop; ++i))
+   {
+         ((len=row=i))
+         ((k=num-2*i))
+         ((up=cur_number))
+         ((down=(k == 1)?up:up+k))
+
+         for ((p=0; p<k-2; ++p)); do
+               eval vec$((++row))[range-len]=$((++down))
+         done
+
+         for ((j=0; j!=k; ++j,++len)); do
+               eval vec${i}[len]=$((++up))
+               eval vec$((range-i))[range-len]=$((++down))
+         done
+
+         for ((d=0; d<k-2; ++d)); do
+               eval vec$((range-i-d-1))[i]=$((++down))
+         done 
+
+         ((cur_number=down))
+   }
+}
+
+{ circle.number.generate; circle.number.show; } | column -t

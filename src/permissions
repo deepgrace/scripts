@@ -1,0 +1,31 @@
+#!/bin/bash
+# permissions 
+# Access rights in octal same as   stat -c "%n %a"
+
+get.permissions()
+{
+    local n bit perm
+    while read line; do
+          ((++n))
+          sid=0
+          while read -n 1 char; do
+                case ${char} in
+                r      )  num=4 ;;
+                w      )  num=2 ;;
+                x      )  num=1 ;;
+                s|t|S|T)  [[ ${char} =~ s|t ]] && num=1 || num=0 
+                          [[ ${char,} == s ]] && ((bit+=(n==1?4:2))) || ((++bit)) ;;
+                *      )  num=0 ;;
+                esac
+                ((sid+=num))
+          done < <(echo ${line})
+          perm+=${sid} 
+    done < <(ls -ld "${1}" | sed -r 's|.(...)(...)(...).*|\1\n\2\n\3|g')
+    (( ! bit )) && bit=0
+    echo "${1}" ${bit}${perm}
+}
+
+for data in "${@}"
+{
+    get.permissions "${data}"
+}

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+upgrade()
+{
+    dnf -y system-upgrade download --releasever=${1}
+}
+
+while ! upgrade ${1}; do
+      :
+done

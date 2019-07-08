@@ -1,0 +1,39 @@
+#!/bin/bash
+# install_go
+
+cat << \EOF >> /etc/profile
+export GOROOT=/usr/local/go
+export GOBIN=${GOROOT}/bin
+export GOOS=linux
+export GOARCH=amd64
+export GOMAXPROCS=1
+export GOPATH=/usr/local/go_library
+export PATH=${GOBIN}:${GOPATH}:${GOROOT}/pkg/tool/linux_amd64:${PATH}
+EOF
+
+cat << \EOF >> ${HOME}/.bashrc
+if ! pidof godoc &> /dev/null; then
+     godoc -play=true -http=:80 &
+fi
+EOF
+
+arch=linux-amd64.tar.gz
+base_url=https://code.google.com/p
+download_list=${base_url}/go/downloads/list
+go_version=$(curl -s ${download_list} | sed -rn "/files\/.*${arch}/{s#.*files/(.*).${arch}.*#\1#g;p;q}")
+go_tarball=${base_url/.com\/p/code.com\/files}/${go_version}.${arch}
+
+source /etc/profile
+mkdir -p ${GOPATH} ${GOROOT}
+wget -o /dev/null ${go_tarball}
+tar -xf ${go_tarball}
+mv go ${GOROOT%/*}
+cd ${GOROOT}/src
+./all.bash
+
+path=${GOROOT}/misc/vim
+echo "syntax on" >> ${HOME}/.vimrc
+mkdir -p ${HOME}/.vim/{ftdetect,syntax,autoload/go}
+ln -s ${path}/syntax/go.vim ${HOME}/.vim/syntax
+ln -s ${path}/ftdetect/gofiletype.vim ${HOME}/.vim/ftdetect
+ln -s ${path}/autoload/go/complete.vim ${HOME}/.vim/autoload/go

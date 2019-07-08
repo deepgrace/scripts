@@ -1,0 +1,20 @@
+#!/bin/bash
+# lotate
+ 
+awk '
+    {
+       if (max_nf<NF)
+           max_nf=NF
+       max_nr=NR
+       for (x=1; x<=NF; ++x)
+            matrix[x, NR]=$x
+    }
+
+END {
+       for (x=max_nf; x>=1; --x)
+       {
+            for (y=1; y<=max_nr; ++y)
+                 printf("%s ", matrix[x, y])
+            printf("\n")
+       }
+    }' "${1:--}"

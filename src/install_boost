@@ -1,0 +1,33 @@
+#!/bin/bash
+# install_boost
+
+build_dir=/usr/local/build
+boost_ver=${1:-boost_1_70_0}
+ver_number=${boost_ver//boost_/}
+tarball_name=${boost_ver}.tar.bz2
+install_dir=/usr/local/${boost_ver}
+boost_ld_conf=/etc/ld.so.conf.d/boost.conf
+download_link=https://dl.bintray.com/boostorg/release
+
+mkdir -p ${build_dir} ${install_dir}
+cd ${build_dir}
+
+if [[ ! -f ${tarball_name} ]]; then
+      wget ${download_link}/${ver_number//_/.}/source/${tarball_name} -o /dev/null
+fi
+
+tar -xf ${tarball_name}
+
+cd ${boost_ver}
+${build_dir}/${boost_ver}/bootstrap.sh --prefix=${install_dir}
+./b2 --build-type=complete --layout=versioned
+./b2 install
+
+cd ${install_dir}/lib
+ls -1 | awk '/[0-9]$/' | xargs -i strip {}
+
+rm -rf ${build_dir}
+dnf -y remove $(rpm -qa | grep boost)
+
+echo ${install_dir}/lib >> ${boost_ld_conf}
+ldconfig

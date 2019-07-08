@@ -1,0 +1,9 @@
+" disable auto-indentation
+" Put this into ~/.vimrc
+set nopaste
+set nocindent
+set nosmartindent
+set noautoindent
+set indentexpr=""
+filetype indent off
+filetype plugin indent off

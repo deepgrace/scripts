@@ -1,0 +1,23 @@
+#!/bin/bash
+# ladder
+
+number=${1:-45}
+
+ladder()
+{
+   for ((i=1; i<=number/2+1; ++i)); do
+         vec=()
+         for ((j=1,n=i-1; j<=i; ++j,--n)); do
+               if (( max+j > number )); then
+                     echo ${vec[@]}
+                     break 2
+               fi
+               ((p=(i%2)?${#vec[@]}:n))
+               ((vec[p]=max+j))
+         done
+         ((max=vec[p]))
+         echo ${vec[@]}
+   done
+}
+
+ladder | column -t

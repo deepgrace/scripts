@@ -1,0 +1,24 @@
+#!/bin/bash
+# matrix_multiplication
+
+awk 'NR == FNR {
+        for (i=1; i<=NF; ++i)
+             matrixA[NR-1,i-1]=$i
+        m=NR
+     }
+     NR != FNR {
+        for (j=1; j<=NF; ++j)
+             matrixB[FNR-1,j-1]=$j
+        n=NF; p=FNR
+     }
+END  {
+        for (u=0; u<m; ++u){
+             for (v=0; v<n; ++v){
+                  sum=0
+                  for (w=0; w<p; ++w)
+                       sum+=matrixA[u,w]*matrixB[w,v]
+                  printf("%d ", sum)
+             }
+             printf("\n")
+        }
+     }' ${@}

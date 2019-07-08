@@ -1,0 +1,40 @@
+#!/bin/bash
+# snake_series
+
+p=0
+q=-1
+n=${1:-10}
+
+pq.update()
+{
+   ((i%2?++${1}:++${2}))
+}
+
+for ((i=1; i!=2*n; ++i))
+{
+    if (( i <= n )); then
+          pq.update q p
+    else
+          pq.update p q
+    fi
+
+    ((j=(i > n)?2*n-i:i))
+
+    for ((k=0; k!=j; ++k))
+    {
+          ((map[p*n+q]=++id))
+          if (( k+1 != j )); then
+             if (( i%2 )); then
+                  ((++p)); ((--q))
+             else
+                  ((--p)); ((++q))
+             fi
+          fi
+    }
+}
+
+for ((i=0; i!=${#map[@]}; ++i))
+{
+      echo -en "${map[i]}\t"
+      (( (i+1)%n == 0 )) && echo
+}
