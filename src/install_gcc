@@ -2,7 +2,7 @@
 # install_gcc
 
 base_dir=/usr/local
-version=${1:-gcc-8.2.0}
+version=${1:-gcc-11.0.1}
 tarball=${version}.tar.bz2
 build_dir=${base_dir}/build
 source_dir=${PWD}/${version}
@@ -57,7 +57,7 @@ rm -rf ${build_dir}
 dnf -y remove $(rpm -qa | grep ^gcc-)
 
 cat << \EOF >> ${HOME}/.bashrc
-gcc_base=/usr/local/gcc.8.2.0
+gcc_base=/usr/local/gcc.11.0.1
 gcc_bin=${gcc_base}/bin
 gcc_lib=${gcc_base}/lib
 gcc_lib64=${gcc_base}/lib64

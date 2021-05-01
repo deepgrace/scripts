@@ -2,12 +2,12 @@
 # install_boost
 
 build_dir=/usr/local/build
-boost_ver=${1:-boost_1_70_0}
+boost_ver=${1:-boost_1_76_0}
 ver_number=${boost_ver//boost_/}
 tarball_name=${boost_ver}.tar.bz2
 install_dir=/usr/local/${boost_ver}
 boost_ld_conf=/etc/ld.so.conf.d/boost.conf
-download_link=https://dl.bintray.com/boostorg/release
+download_link=https://boostorg.jfrog.io/artifactory/main/release
 
 mkdir -p ${build_dir} ${install_dir}
 cd ${build_dir}
